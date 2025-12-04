@@ -1,9 +1,9 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef } from 'react';
 import { Loader2, Eye, EyeOff, X } from 'lucide-react';
 
 // --- Colors ---
 // Dark Backgrounds: #0D1117 (Main), #161B22 (Cards/Inputs)
-// Tiffany Green: #0ABAB5
+// Tiffany Green: #1DE9B6 (Updated Bright)
 
 // --- Button ---
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
@@ -32,10 +32,10 @@ export const Button: React.FC<ButtonProps> = ({
   };
 
   const variants = {
-    primary: "bg-[#0ABAB5] text-[#0D1117] hover:bg-[#089a95] focus:ring-[#0ABAB5] shadow-[0_0_15px_rgba(10,186,181,0.2)] font-bold tracking-wide",
+    primary: "bg-[#1DE9B6] text-[#0D1117] hover:bg-[#00BFA5] focus:ring-[#1DE9B6] shadow-[0_0_15px_rgba(29,233,182,0.3)] font-bold tracking-wide",
     secondary: "bg-[#161B22] text-white hover:bg-[#21262D] focus:ring-slate-500 border border-[#30363D]",
-    outline: "border border-[#30363D] bg-transparent text-slate-200 hover:bg-[#161B22] hover:border-[#0ABAB5] focus:ring-[#0ABAB5]",
-    ghost: "text-slate-400 hover:bg-[#161B22] hover:text-[#0ABAB5]",
+    outline: "border border-[#30363D] bg-transparent text-slate-200 hover:bg-[#161B22] hover:border-[#1DE9B6] hover:text-[#1DE9B6] focus:ring-[#1DE9B6]",
+    ghost: "text-slate-400 hover:bg-[#161B22] hover:text-[#1DE9B6]",
   };
 
   const widthClass = fullWidth ? 'w-full' : '';
@@ -49,6 +49,27 @@ export const Button: React.FC<ButtonProps> = ({
       {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
       {children}
     </button>
+  );
+};
+
+// --- Badge ---
+interface BadgeProps {
+  children: React.ReactNode;
+  variant?: 'default' | 'outline';
+  className?: string;
+}
+
+export const Badge: React.FC<BadgeProps> = ({ children, variant = 'default', className = '' }) => {
+  const base = "inline-flex items-center rounded-full px-3 py-1 text-xs font-bold uppercase tracking-wider";
+  const variants = {
+    default: "bg-[#1DE9B6]/10 text-[#1DE9B6] border border-[#1DE9B6]/20",
+    outline: "border border-[#30363D] text-slate-400"
+  };
+
+  return (
+    <span className={`${base} ${variants[variant]} ${className}`}>
+      {children}
+    </span>
   );
 };
 
@@ -71,7 +92,7 @@ export const Input: React.FC<InputProps> = ({ label, error, helperText, classNam
       <div className="relative">
         <input
           type={inputType}
-          className={`flex h-11 w-full rounded-md border border-[#30363D] bg-[#0D1117] px-3 py-2 text-sm text-slate-100 placeholder:text-slate-600 focus:outline-none focus:ring-1 focus:ring-[#0ABAB5] focus:border-[#0ABAB5] transition-colors disabled:cursor-not-allowed disabled:opacity-50 ${error ? 'border-red-500 focus:ring-red-500 focus:border-red-500' : ''} ${className}`}
+          className={`flex h-11 w-full rounded-md border border-[#30363D] bg-[#0D1117] px-3 py-2 text-sm text-slate-100 placeholder:text-slate-600 focus:outline-none focus:ring-1 focus:ring-[#1DE9B6] focus:border-[#1DE9B6] transition-colors disabled:cursor-not-allowed disabled:opacity-50 ${error ? 'border-red-500 focus:ring-red-500 focus:border-red-500' : ''} ${className}`}
           {...props}
         />
         {canToggleVisibility && (
@@ -103,7 +124,7 @@ export const Select: React.FC<SelectProps> = ({ label, error, options, className
     <div className="w-full space-y-1.5">
       {label && <label className="text-sm font-semibold leading-none text-slate-300">{label}</label>}
       <select
-        className={`flex h-11 w-full rounded-md border border-[#30363D] bg-[#0D1117] px-3 py-2 text-sm text-slate-100 focus:outline-none focus:ring-1 focus:ring-[#0ABAB5] focus:border-[#0ABAB5] disabled:cursor-not-allowed disabled:opacity-50 ${error ? 'border-red-500' : ''} ${className}`}
+        className={`flex h-11 w-full rounded-md border border-[#30363D] bg-[#0D1117] px-3 py-2 text-sm text-slate-100 focus:outline-none focus:ring-1 focus:ring-[#1DE9B6] focus:border-[#1DE9B6] disabled:cursor-not-allowed disabled:opacity-50 ${error ? 'border-red-500' : ''} ${className}`}
         {...props}
       >
         <option value="" disabled className="bg-[#0D1117]">Select an option</option>
@@ -117,9 +138,9 @@ export const Select: React.FC<SelectProps> = ({ label, error, options, className
 };
 
 // --- Card ---
-export const Card: React.FC<{ children: React.ReactNode; className?: string }> = ({ children, className = '' }) => {
+export const Card: React.FC<{ children: React.ReactNode; className?: string; hoverEffect?: boolean }> = ({ children, className = '', hoverEffect = false }) => {
   return (
-    <div className={`rounded-xl border border-[#30363D] bg-[#161B22] text-slate-50 shadow-xl ${className}`}>
+    <div className={`rounded-xl border border-[#30363D] bg-[#161B22] text-slate-50 ${hoverEffect ? 'transition-all duration-300 hover:border-[#1DE9B6]/50 hover:shadow-lg hover:-translate-y-1' : ''} ${className}`}>
       {children}
     </div>
   );
@@ -138,7 +159,7 @@ export const Checkbox: React.FC<CheckboxProps> = ({ label, error, disabled, ...p
         <input
           type="checkbox"
           disabled={disabled}
-          className="h-5 w-5 mt-0.5 rounded border-[#30363D] bg-[#0D1117] text-[#0ABAB5] focus:ring-[#0ABAB5] focus:ring-offset-[#0D1117] disabled:cursor-not-allowed"
+          className="h-5 w-5 mt-0.5 rounded border-[#30363D] bg-[#0D1117] text-[#1DE9B6] focus:ring-[#1DE9B6] focus:ring-offset-[#0D1117] disabled:cursor-not-allowed"
           {...props}
         />
         <label className={`text-sm font-medium leading-normal ${disabled ? 'text-slate-500' : 'text-slate-300 cursor-pointer hover:text-slate-200'}`}>
@@ -162,7 +183,7 @@ export const Logo: React.FC<LogoProps> = ({ size = 'md', className = '' }) => {
   const imgSizes = {
     sm: "h-10",
     md: "h-16",
-    lg: "h-24" // Adjusted to match prompt requirements better (180px in prompt is huge for components, scaling appropriately)
+    lg: "h-24"
   };
   
   const textSizes = {
@@ -174,7 +195,7 @@ export const Logo: React.FC<LogoProps> = ({ size = 'md', className = '' }) => {
   if (imgError) {
     return (
       <div className={`font-bold tracking-tight text-white ${textSizes[size]} font-sans ${className}`}>
-        <span className="text-[#0ABAB5]">Luria</span> Mind
+        <span className="text-[#1DE9B6]">Luria</span> Mind
       </div>
     );
   }
@@ -205,15 +226,15 @@ export const RadioCard: React.FC<RadioCardProps> = ({ selected, title, descripti
       onClick={onClick}
       className={`p-5 rounded-lg border-2 cursor-pointer transition-all duration-200 group ${
         selected 
-          ? 'border-[#0ABAB5] bg-[#0ABAB5]/5 shadow-[0_0_15px_rgba(10,186,181,0.1)]' 
+          ? 'border-[#1DE9B6] bg-[#1DE9B6]/5 shadow-[0_0_15px_rgba(29,233,182,0.1)]' 
           : 'border-[#30363D] bg-[#0D1117] hover:border-slate-500'
       }`}
     >
       <div className="flex items-center space-x-4">
         <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors ${
-           selected ? 'border-[#0ABAB5]' : 'border-slate-600 group-hover:border-slate-400'
+           selected ? 'border-[#1DE9B6]' : 'border-slate-600 group-hover:border-slate-400'
         }`}>
-          {selected && <div className="w-2.5 h-2.5 rounded-full bg-[#0ABAB5]" />}
+          {selected && <div className="w-2.5 h-2.5 rounded-full bg-[#1DE9B6]" />}
         </div>
         <div>
           <h4 className={`text-base font-bold ${selected ? 'text-white' : 'text-slate-300 group-hover:text-white'}`}>{title}</h4>
@@ -239,7 +260,6 @@ export const Modal: React.FC<ModalProps> = ({ isOpen, onClose, title, children, 
   const handleScroll = () => {
     if (contentRef.current && onScrollToBottom) {
       const { scrollTop, scrollHeight, clientHeight } = contentRef.current;
-      // Allow a small buffer (e.g., 5px) for floating point inaccuracies
       if (scrollTop + clientHeight >= scrollHeight - 5) {
         onScrollToBottom();
       }

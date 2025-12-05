@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { AppView, User } from './types';
-import Landing from './screens/Landing';
-import Login from './screens/Login';
-import Register from './screens/Register';
-import EmailVerification from './screens/EmailVerification';
-import MFA from './screens/MFA';
-import Onboarding from './screens/Onboarding';
-import Dashboard from './screens/Dashboard';
+import { AppView, User } from '../types';
+import Landing from '../screens/Landing';
+import Login from '../screens/Login';
+import Register from '../screens/Register';
+import EmailVerification from '../screens/EmailVerification';
+import MFA from '../screens/MFA';
+import Onboarding from '../screens/Onboarding';
+import Dashboard from '../screens/Dashboard';
 import { AuthProvider, useAuth } from './hooks/useAuth'; // Import Context
 
 // Internal Component to handle view logic based on Auth State

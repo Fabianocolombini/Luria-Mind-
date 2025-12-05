@@ -10,9 +10,16 @@ import {
   User
 } from 'firebase/auth';
 
+const checkAuth = () => {
+  if (!auth || !(auth as any).app) {
+    throw new Error("Firebase Auth is not initialized. Please check your environment variables (API Keys).");
+  }
+};
+
 export const authService = {
   // --- Email/Password ---
   async signUp(email: string, password: string) {
+    checkAuth();
     console.log(`[AuthService] Attempting signUp for: ${email}`);
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
@@ -25,6 +32,7 @@ export const authService = {
   },
 
   async signIn(email: string, password: string) {
+    checkAuth();
     try {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       return userCredential.user;
@@ -35,6 +43,7 @@ export const authService = {
   },
 
   async signOut() {
+    checkAuth();
     try {
       await firebaseSignOut(auth);
     } catch (error) {
@@ -43,6 +52,7 @@ export const authService = {
   },
 
   async sendVerificationEmail(user: User) {
+    checkAuth();
     try {
       await firebaseSendEmailVerification(user);
       console.log("[AuthService] Verification email sent.");
@@ -53,6 +63,7 @@ export const authService = {
 
   // --- OAuth Providers ---
   async signInWithGoogle() {
+    checkAuth();
     try {
       const provider = new GoogleAuthProvider();
       const result = await signInWithPopup(auth, provider);
@@ -64,6 +75,7 @@ export const authService = {
   },
 
   async signInWithMicrosoft() {
+    checkAuth();
     try {
       const provider = new OAuthProvider('microsoft.com');
       // Add specific scopes if needed
@@ -77,6 +89,7 @@ export const authService = {
   },
 
   async signInWithApple() {
+    checkAuth();
     try {
       const provider = new OAuthProvider('apple.com');
       const result = await signInWithPopup(auth, provider);

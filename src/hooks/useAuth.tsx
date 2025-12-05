@@ -24,7 +24,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [loading, setLoading] = useState(true);
 
   const refreshProfile = async () => {
-    if (auth.currentUser) {
+    if (auth && auth.currentUser) {
       try {
         const profile = await firestoreService.getTherapist(auth.currentUser.uid);
         setUserProfile(profile);
@@ -35,6 +35,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   useEffect(() => {
+    // Safety Check: If Firebase keys are missing, auth is an empty object {}.
+    // We check if it has the internal 'app' property or similar to verify it's a real Auth instance.
+    if (!auth || !(auth as any).app) {
+      console.warn("Firebase Auth not initialized. Missing API keys? Skipping auth listener.");
+      setLoading(false);
+      return;
+    }
+
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       setCurrentUser(user);
       if (user) {

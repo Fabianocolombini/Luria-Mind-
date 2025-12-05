@@ -5,7 +5,7 @@ import { ArrowLeft, AlertCircle, Building2, User, FileText, ChevronRight } from 
 import { authService } from '../services/authService';
 import { firestoreService } from '../services/firestoreService';
 import { FirestoreTherapist } from '../config/firestoreSchema';
-import { Timestamp } from 'firebase/firestore/lite';
+import { Timestamp } from 'firebase/firestore';
 
 interface RegisterProps {
   onNavigate: (view: AppView) => void;
@@ -21,8 +21,84 @@ Luria Mind - Terms of Service and Data Protection Agreement
 **Last Updated:** December 3, 2025
 
 1. INTRODUCTION AND ACCEPTANCE
-By accessing or using Luria Mind ("the Platform"), you ("Therapist," "User," "you") agree to be bound by these Privacy & Data Security terms...
-(Full text abridged for brevity in code, keep full text in production)
+By accessing or using Luria Mind ("the Platform"), you ("Therapist," "User," "you") agree to be bound by these Privacy & Data Security terms. Luria Mind is a clinical intelligence platform designed exclusively for licensed mental health professionals.
+
+**If you do not agree with these terms, you must not use the Platform.**
+
+
+2. DATA OWNERSHIP AND CONTROL
+
+ 2.1 You Are the Data Controller
+- **You retain full ownership** of all clinical data, patient information, session recordings, and therapeutic notes entered into the Platform.
+- Luria Mind acts solely as a **Data Processor** under your instruction and control.
+- You are responsible for obtaining appropriate patient consent before using the Platform to record or analyze therapy sessions.
+
+2.2 Patient Rights
+- Your patients retain all rights to their personal health information (PHI).
+- You must inform patients that their session data will be processed by AI technology.
+- You must provide patients with the ability to request access, correction, or deletion of their data.
+
+
+ 3. HIPAA COMPLIANCE
+
+ 3.1 Business Associate Agreement (BAA)
+- Luria Mind has executed a **Business Associate Agreement (BAA)** with Google Cloud, our infrastructure provider, ensuring full HIPAA compliance.
+- Upon request, we will provide you with a signed BAA for your records.
+
+3.2 Protected Health Information (PHI)
+- All PHI is handled in accordance with the **Health Insurance Portability and Accountability Act (HIPAA)** and its implementing regulations (45 CFR Parts 160 and 164).
+- We implement administrative, physical, and technical safeguards to protect PHI from unauthorized access, use, or disclosure.
+
+.3 Breach Notification
+- In the event of a data breach affecting PHI, we will notify you within **72 hours** as required by HIPAA.
+- You remain responsible for notifying affected patients as required by law.
+
+
+
+4. DATA ENCRYPTION AND SECURITY
+
+4.1 Encryption Standards
+- **At Rest:** All data is encrypted using **AES-256** encryption.
+- **In Transit:** All data transmission uses **TLS 1.3** encryption.
+- **Encryption Keys:** Managed securely through Google Cloud Key Management Service (KMS) with role-based access control.
+
+4.2 Authentication and Access Control
+- **Multi-Factor Authentication (MFA)** is mandatory for all user accounts.
+- Session tokens expire after **30 minutes** of inactivity.
+- All access to PHI is logged and auditable.
+
+4.3 Infrastructure Security
+- **Cloud Provider:** Google Cloud Platform (HIPAA-compliant data centers).
+- **Geographic Location:** Data is stored in HIPAA-compliant regions (US or EU, based on your account settings).
+- **Redundancy:** Automated backups every 24 hours, retained for **30 days**.
+
+---
+
+5. AI MODEL TRAINING AND DATA USE
+
+5.1 Exclusive Therapeutic Use
+- **The AI model powering Luria Mind is trained exclusively for therapeutic and clinical analysis.**
+- Your clinical data is **NEVER** used to train third-party AI models or shared with external AI providers.
+
+5.2 Opt-In Data Contribution
+- You may **optionally** contribute **anonymized, de-identified** session data to improve Luria Mind's AI model.
+- This is **entirely voluntary** and can be enabled or disabled at any time in your account settings.
+- De-identification follows HIPAA Safe Harbor standards (removal of 18 identifiers).
+
+5.3 No Third-Party Sharing
+- We do **not** sell, rent, or share your data with third parties for marketing or commercial purposes.
+- We do **not** share PHI with any third party except:
+  - As required by law (e.g., court order, subpoena).
+  - With your explicit written consent.
+  - With our HIPAA-compliant service providers under BAA (e.g., Google Cloud).
+
+
+
+6. DATA RETENTION AND DELETION
+
+6.1 Retention Period
+- Clinical session data is retained **indefinitely** or as long as you maintain an active account.
+- You may configure automatic deletion schedules.
 `;
 
 const Register: React.FC<RegisterProps> = ({ onNavigate, onRegisterSuccess }) => {

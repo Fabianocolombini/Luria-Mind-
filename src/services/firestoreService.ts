@@ -10,7 +10,7 @@ import {
   where, 
   getDocs,
   Timestamp 
-} from 'firebase/firestore/lite';
+} from 'firebase/firestore';
 import { FirestoreTherapist, FirestorePatient, FirestoreSession } from '../config/firestoreSchema';
 
 const COLLECTION_THERAPISTS = 'therapists';
@@ -18,9 +18,16 @@ const COLLECTION_PATIENTS = 'patients';
 const COLLECTION_SESSIONS = 'sessions';
 const COLLECTION_BETA_CODES = 'beta_codes';
 
+const checkDb = () => {
+    if (!db || !(db as any).app) {
+        throw new Error("Firestore is not initialized. Please check your environment variables (API Keys).");
+    }
+};
+
 export const firestoreService = {
   // --- Therapist ---
   async createTherapist(uid: string, data: Omit<FirestoreTherapist, 'id'>) {
+    checkDb();
     console.log(`[FirestoreService] Creating therapist profile for UID: ${uid}`);
     try {
       const docRef = doc(db, COLLECTION_THERAPISTS, uid);
@@ -41,6 +48,7 @@ export const firestoreService = {
   },
 
   async getTherapist(uid: string): Promise<FirestoreTherapist | null> {
+    checkDb();
     try {
       const docRef = doc(db, COLLECTION_THERAPISTS, uid);
       const docSnap = await getDoc(docRef);
@@ -55,6 +63,7 @@ export const firestoreService = {
   },
 
   async updateTherapist(uid: string, data: Partial<FirestoreTherapist>) {
+    checkDb();
     try {
       const docRef = doc(db, COLLECTION_THERAPISTS, uid);
       await updateDoc(docRef, data);
@@ -66,6 +75,7 @@ export const firestoreService = {
 
   // --- Beta Codes ---
   async validateBetaCode(code: string): Promise<boolean> {
+    checkDb();
     try {
         const q = query(
           collection(db, COLLECTION_BETA_CODES), 
@@ -82,6 +92,7 @@ export const firestoreService = {
   },
 
   async claimBetaCode(code: string, uid: string) {
+    checkDb();
     try {
         const q = query(collection(db, COLLECTION_BETA_CODES), where("code", "==", code));
         const querySnapshot = await getDocs(q);
@@ -100,6 +111,7 @@ export const firestoreService = {
 
   // --- Patients (Basic Shell) ---
   async createPatient(therapistId: string, data: Omit<FirestorePatient, 'id' | 'therapistId' | 'createdAt'>) {
+    checkDb();
     const colRef = collection(db, COLLECTION_PATIENTS);
     await addDoc(colRef, {
       ...data,
@@ -110,6 +122,7 @@ export const firestoreService = {
 
   // --- Sessions (Basic Shell) ---
   async createSession(therapistId: string, patientId: string, data: any) {
+    checkDb();
     const colRef = collection(db, COLLECTION_SESSIONS);
     await addDoc(colRef, {
       ...data,

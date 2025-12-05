@@ -109,7 +109,12 @@ const Register: React.FC<RegisterProps> = ({ onNavigate, onRegisterSuccess }) =>
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!validateForm()) return;
+    console.log("[Register] Submit initiated");
+    
+    if (!validateForm()) {
+        console.warn("[Register] Validation failed", errors);
+        return;
+    }
 
     setIsSubmitting(true);
     setApiError(null);
@@ -120,6 +125,7 @@ const Register: React.FC<RegisterProps> = ({ onNavigate, onRegisterSuccess }) =>
       let planType: 'free' | 'beta_test' = 'free';
       
       if (formData.betaToken) {
+          console.log("[Register] Validating Beta Token:", formData.betaToken);
           const isValid = await firestoreService.validateBetaCode(formData.betaToken);
           if (!isValid) {
               setErrors(prev => ({ ...prev, betaToken: "Invalid or expired beta code" }));
@@ -128,10 +134,13 @@ const Register: React.FC<RegisterProps> = ({ onNavigate, onRegisterSuccess }) =>
           }
           credits = 50;
           planType = 'beta_test';
+          console.log("[Register] Beta Token valid. Credits set to 50.");
       }
 
       // 2. Create Auth User
+      console.log("[Register] Creating Auth User...");
       const user = await authService.signUp(formData.email, formData.password);
+      console.log("[Register] Auth User created:", user.uid);
       
       // 3. Prepare Firestore Data
       const therapistData: Omit<FirestoreTherapist, 'id'> = {
@@ -145,7 +154,7 @@ const Register: React.FC<RegisterProps> = ({ onNavigate, onRegisterSuccess }) =>
         // Onboarding empty initially
         approaches: [],
         preferences: {
-            language: 'English', // Default, updated in onboarding
+            language: 'English', 
             sessionType: '',
             reportStyle: '',
             notifications: []
@@ -170,7 +179,9 @@ const Register: React.FC<RegisterProps> = ({ onNavigate, onRegisterSuccess }) =>
       }
 
       // 4. Save to Firestore
+      console.log("[Register] Saving to Firestore...");
       await firestoreService.createTherapist(user.uid, therapistData);
+      console.log("[Register] Saved to Firestore.");
 
       // 5. Claim Beta Code if used
       if (formData.betaToken) {
@@ -181,15 +192,22 @@ const Register: React.FC<RegisterProps> = ({ onNavigate, onRegisterSuccess }) =>
       await authService.sendVerificationEmail(user);
 
       // Success
+      console.log("[Register] Registration process complete.");
       onRegisterSuccess(formData.email);
 
     } catch (err: any) {
-      console.error(err);
+      console.error("[Register] Fatal Error during registration:", err);
+      let errorMessage = "Failed to create account. Please try again.";
+      
       if (err.code === 'auth/email-already-in-use') {
-          setApiError("This email is already registered. Please login.");
-      } else {
-          setApiError("Failed to create account. Please try again.");
+          errorMessage = "This email is already registered. Please login.";
+      } else if (err.code === 'permission-denied') {
+          errorMessage = "System error: Database permission denied. Please contact support.";
+      } else if (err.message) {
+          errorMessage = err.message;
       }
+      
+      setApiError(errorMessage);
     } finally {
       setIsSubmitting(false);
     }

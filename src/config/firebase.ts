@@ -1,9 +1,9 @@
-import { initializeApp } from 'firebase/app';
+import { initializeApp, getApps, FirebaseApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
 import { getStorage } from 'firebase/storage';
 
-// Cast import.meta to any to allow access to env property (Vite)
+// Access environment variables directly from import.meta.env (Vite)
 const env = (import.meta as any).env;
 
 const firebaseConfig = {
@@ -12,11 +12,27 @@ const firebaseConfig = {
   projectId: env.VITE_FIREBASE_PROJECT_ID,
   storageBucket: env.VITE_FIREBASE_STORAGE_BUCKET,
   messagingSenderId: env.VITE_FIREBASE_MESSAGING_SENDER_ID,
-  appId: env.VITE_FIREBASE_APP_ID,
-  measurementId: env.VITE_FIREBASE_MEASUREMENT_ID
+  appId: env.VITE_FIREBASE_APP_ID
 };
 
-const app = initializeApp(firebaseConfig);
+// Debugging: Validate configuration (Check console in production to see if vars are missing)
+const missingKeys = Object.entries(firebaseConfig)
+  .filter(([key, value]) => !value)
+  .map(([key]) => key);
+
+if (missingKeys.length > 0) {
+  console.error(`Firebase Config Error: Missing keys: ${missingKeys.join(', ')}`);
+} else {
+  console.log('Firebase config loaded.');
+}
+
+// Initialize Firebase only if not already initialized
+let app: FirebaseApp;
+if (getApps().length === 0) {
+  app = initializeApp(firebaseConfig);
+} else {
+  app = getApps()[0];
+}
 
 export const auth = getAuth(app);
 export const db = getFirestore(app);

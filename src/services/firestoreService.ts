@@ -21,53 +21,80 @@ const COLLECTION_BETA_CODES = 'beta_codes';
 export const firestoreService = {
   // --- Therapist ---
   async createTherapist(uid: string, data: Omit<FirestoreTherapist, 'id'>) {
-    const docRef = doc(db, COLLECTION_THERAPISTS, uid);
-    await setDoc(docRef, {
-      ...data,
-      id: uid,
-      createdAt: Timestamp.now(),
-      lastLogin: Timestamp.now()
-    });
+    console.log(`[FirestoreService] Creating therapist profile for UID: ${uid}`);
+    try {
+      const docRef = doc(db, COLLECTION_THERAPISTS, uid);
+      await setDoc(docRef, {
+        ...data,
+        id: uid,
+        createdAt: Timestamp.now(),
+        lastLogin: Timestamp.now()
+      });
+      console.log(`[FirestoreService] Therapist profile created successfully.`);
+    } catch (error: any) {
+      console.error("[FirestoreService] createTherapist Error:", error);
+      if (error.code === 'permission-denied') {
+        console.error("Firestore Permission Denied. Check security rules for 'therapists' collection.");
+      }
+      throw error;
+    }
   },
 
   async getTherapist(uid: string): Promise<FirestoreTherapist | null> {
-    const docRef = doc(db, COLLECTION_THERAPISTS, uid);
-    const docSnap = await getDoc(docRef);
-    if (docSnap.exists()) {
-      return docSnap.data() as FirestoreTherapist;
+    try {
+      const docRef = doc(db, COLLECTION_THERAPISTS, uid);
+      const docSnap = await getDoc(docRef);
+      if (docSnap.exists()) {
+        return docSnap.data() as FirestoreTherapist;
+      }
+      return null;
+    } catch (error) {
+      console.error("[FirestoreService] getTherapist Error:", error);
+      throw error;
     }
-    return null;
   },
 
   async updateTherapist(uid: string, data: Partial<FirestoreTherapist>) {
-    const docRef = doc(db, COLLECTION_THERAPISTS, uid);
-    await updateDoc(docRef, data);
+    try {
+      const docRef = doc(db, COLLECTION_THERAPISTS, uid);
+      await updateDoc(docRef, data);
+    } catch (error) {
+       console.error("[FirestoreService] updateTherapist Error:", error);
+       throw error;
+    }
   },
 
   // --- Beta Codes ---
   async validateBetaCode(code: string): Promise<boolean> {
-    // Note: In a real app, use a Cloud Function or Transaction to prevent race conditions
-    // This is a simplified read-check
-    const q = query(
-      collection(db, COLLECTION_BETA_CODES), 
-      where("code", "==", code),
-      where("isValid", "==", true)
-    );
-    
-    const querySnapshot = await getDocs(q);
-    return !querySnapshot.empty;
+    try {
+        const q = query(
+          collection(db, COLLECTION_BETA_CODES), 
+          where("code", "==", code),
+          where("isValid", "==", true)
+        );
+        
+        const querySnapshot = await getDocs(q);
+        return !querySnapshot.empty;
+    } catch (error) {
+        console.error("[FirestoreService] validateBetaCode Error:", error);
+        return false;
+    }
   },
 
   async claimBetaCode(code: string, uid: string) {
-    const q = query(collection(db, COLLECTION_BETA_CODES), where("code", "==", code));
-    const querySnapshot = await getDocs(q);
-    
-    if (!querySnapshot.empty) {
-      const docRef = querySnapshot.docs[0].ref;
-      await updateDoc(docRef, {
-        isValid: false,
-        usedBy: uid
-      });
+    try {
+        const q = query(collection(db, COLLECTION_BETA_CODES), where("code", "==", code));
+        const querySnapshot = await getDocs(q);
+        
+        if (!querySnapshot.empty) {
+          const docRef = querySnapshot.docs[0].ref;
+          await updateDoc(docRef, {
+            isValid: false,
+            usedBy: uid
+          });
+        }
+    } catch (error) {
+        console.error("[FirestoreService] claimBetaCode Error:", error);
     }
   },
 

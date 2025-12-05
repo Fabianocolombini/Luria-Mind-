@@ -5,7 +5,7 @@ import { ArrowLeft, AlertCircle, Building2, User, FileText, ChevronRight } from 
 import { authService } from '../services/authService';
 import { firestoreService } from '../services/firestoreService';
 import { FirestoreTherapist } from '../config/firestoreSchema';
-import { Timestamp } from 'firebase/firestore';
+import { Timestamp } from 'firebase/firestore/lite';
 
 interface RegisterProps {
   onNavigate: (view: AppView) => void;

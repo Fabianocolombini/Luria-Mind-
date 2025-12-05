@@ -10,7 +10,7 @@ import {
   where, 
   getDocs,
   Timestamp 
-} from 'firebase/firestore';
+} from 'firebase/firestore/lite';
 import { FirestoreTherapist, FirestorePatient, FirestoreSession } from '../config/firestoreSchema';
 
 const COLLECTION_THERAPISTS = 'therapists';

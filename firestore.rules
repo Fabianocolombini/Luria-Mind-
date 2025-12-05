@@ -1,0 +1,43 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return request.auth.uid == userId;
+    }
+
+    // Therapists: Users can read/write their own profile
+    match /therapists/{userId} {
+      allow create: if isAuthenticated() && isOwner(userId);
+      allow read, update: if isAuthenticated() && isOwner(userId);
+      // No delete in this basic rule set for safety
+    }
+
+    // Patients: Only accessible by the specific therapist
+    match /patients/{patientId} {
+      allow create: if isAuthenticated() && request.resource.data.therapistId == request.auth.uid;
+      allow read, update, delete: if isAuthenticated() && resource.data.therapistId == request.auth.uid;
+    }
+
+    // Sessions: Only accessible by the specific therapist
+    match /sessions/{sessionId} {
+      allow create: if isAuthenticated() && request.resource.data.therapistId == request.auth.uid;
+      allow read, update: if isAuthenticated() && resource.data.therapistId == request.auth.uid;
+    }
+    
+    // Beta Codes: Read only to check validity (simplified, better handled via Cloud Functions in production)
+    match /beta_codes/{codeId} {
+      // Allow reading only if the user is authenticated (to validate during signup/dash)
+      // BUT for registration flow, user might not be fully authed or is just creating auth.
+      // Ideally, beta code validation should be a Cloud Function.
+      // For this client-side demo, we allow read if true, but in production this exposes codes.
+      allow read: if true; 
+      allow write: if false; // Admin only
+    }
+  }
+}
